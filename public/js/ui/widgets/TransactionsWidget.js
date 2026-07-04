@@ -5,22 +5,26 @@
  * */
 
 class TransactionsWidget {
-  /**
-   * Устанавливает полученный элемент
-   * в свойство element.
-   * Если переданный элемент не существует,
-   * необходимо выкинуть ошибку.
-   * */
-  constructor( element ) {
+  #element;
 
+  constructor(element) {
+    this.#element = element;
+
+    this.registerEvents();
   }
-  /**
-   * Регистрирует обработчики нажатия на
-   * кнопки «Новый доход» и «Новый расход».
-   * При нажатии вызывает Modal.open() для
-   * экземпляра окна
-   * */
-  registerEvents() {
 
+  registerEvents() {
+    this.#element.addEventListener('click', (e) => {
+      const createIncomeButtonEl = e.target.closest('.create-income-button');
+      const createExpenseButtonEl = e.target.closest('.create-expense-button');
+
+      if (createIncomeButtonEl) {
+        App.getModal('newIncome').open();
+      }
+
+      if (createExpenseButtonEl) {
+        App.getModal('newExpense').open();
+      }
+    });
   }
 }

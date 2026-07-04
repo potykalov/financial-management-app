@@ -4,80 +4,94 @@
  * */
 
 class AccountsWidget {
-  /**
-   * Устанавливает текущий элемент в свойство element
-   * Регистрирует обработчики событий с помощью
-   * AccountsWidget.registerEvents()
-   * Вызывает AccountsWidget.update() для получения
-   * списка счетов и последующего отображения
-   * Если переданный элемент не существует,
-   * необходимо выкинуть ошибку.
-   * */
-  constructor( element ) {
+  #element;
 
+  constructor(element) {
+    if (!element) {
+      throw new Error('Передан пустой элемент в конструктор');
+    }
+
+    this.#element = element;
+
+    this.registerEvents();
+
+    this.update();
   }
 
-  /**
-   * При нажатии на .create-account открывает окно
-   * #modal-new-account для создания нового счёта
-   * При нажатии на один из существующих счетов
-   * (которые отображены в боковой колонке),
-   * вызывает AccountsWidget.onSelectAccount()
-   * */
   registerEvents() {
+    const createAccountButtonEl = document.querySelector('.create-account');
 
+    createAccountButtonEl.addEventListener('click', () => {
+      App.getModal('createAccount').open();
+    });
+
+    this.#element.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const targetAccountButtonEl = e.target.closest('.account');
+
+      this.onSelectAccount(targetAccountButtonEl);
+    });
   }
 
-  /**
-   * Метод доступен только авторизованным пользователям
-   * (User.current()).
-   * Если пользователь авторизован, необходимо
-   * получить список счетов через Account.list(). При
-   * успешном ответе необходимо очистить список ранее
-   * отображённых счетов через AccountsWidget.clear().
-   * Отображает список полученных счетов с помощью
-   * метода renderItems()
-   * */
   update() {
+    if (User.current()) {
+      Account.list({}, (err, response) => {
+        const counts = response.data;
 
+        this.clear(); // куда ставить?
+        this.renderItems(counts);
+      });
+    }
   }
 
-  /**
-   * Очищает список ранее отображённых счетов.
-   * Для этого необходимо удалять все элементы .account
-   * в боковой колонке
-   * */
   clear() {
+    const accountEls = this.#element.querySelectorAll('.account');
 
+    accountEls.forEach((accountEl) => {
+      accountEl.remove();
+    });
   }
 
-  /**
-   * Срабатывает в момент выбора счёта
-   * Устанавливает текущему выбранному элементу счёта
-   * класс .active. Удаляет ранее выбранному элементу
-   * счёта класс .active.
-   * Вызывает App.showPage( 'transactions', { account_id: id_счёта });
-   * */
-  onSelectAccount( element ) {
+  onSelectAccount(element) {
+    const accountsPanelEl = document.querySelector('.accounts-panel');
+    const accountButtonEls = accountsPanelEl.querySelectorAll('.account');
+    const dataId = element.dataset.id;
 
+    accountButtonEls.forEach((accountButton) => {
+      accountButton.classList.remove('active');
+    });
+
+    element.classList.add('active');
+
+    App.showPage('transactions', { account_id: dataId });
   }
 
-  /**
-   * Возвращает HTML-код счёта для последующего
-   * отображения в боковой колонке.
-   * item - объект с данными о счёте
-   * */
-  getAccountHTML(item){
+  getAccountHTML(item) {
+    const { id, name, sum } = item;
+    const formattedSum = sum.toLocaleString('ru-RU', {
+      style: 'currency',
+      currency: 'RUB',
+    });
 
+    return `<li class="account" data-id="${id}">
+              <a href="#">
+                <span>${name}</span> /
+                <span>${formattedSum}</span>
+              </a>
+            </li>`;
   }
 
-  /**
-   * Получает массив с информацией о счетах.
-   * Отображает полученный с помощью метода
-   * AccountsWidget.getAccountHTML HTML-код элемента
-   * и добавляет его внутрь элемента виджета
-   * */
-  renderItems(data){
+  renderItems(data) {
+    const accountsPanelEl = document.querySelector('.accounts-panel');
+    let allCountsHtml = '';
 
+    data.forEach((count) => {
+      const countHtml = this.getAccountHTML(count);
+
+      allCountsHtml += countHtml;
+    });
+
+    accountsPanelEl.insertAdjacentHTML('beforeend', allCountsHtml);
   }
 }

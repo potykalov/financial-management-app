@@ -3,32 +3,56 @@
  * кнопки скрытия/показа колонки в мобильной версии сайта
  * и за кнопки меню
  * */
+
 class Sidebar {
-  /**
-   * Запускает initAuthLinks и initToggleButton
-   * */
   static init() {
     this.initAuthLinks();
     this.initToggleButton();
   }
 
-  /**
-   * Отвечает за скрытие/показа боковой колонки:
-   * переключает два класса для body: sidebar-open и sidebar-collapse
-   * при нажатии на кнопку .sidebar-toggle
-   * */
   static initToggleButton() {
+    const sidebarToggleEl = document.querySelector('.sidebar-toggle');
+    const bodyEl = document.querySelector('body');
 
+    sidebarToggleEl.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      bodyEl.classList.toggle('sidebar-open');
+      bodyEl.classList.toggle('sidebar-collapse');
+    });
   }
 
-  /**
-   * При нажатии на кнопку входа, показывает окно входа
-   * (через найденное в App.getModal)
-   * При нажатии на кнопку регастрации показывает окно регистрации
-   * При нажатии на кнопку выхода вызывает User.logout и по успешному
-   * выходу устанавливает App.setState( 'init' )
-   * */
   static initAuthLinks() {
+    const registerButtonEl = document.querySelector('.menu-item_register > a');
+    const registerModal = App.getModal('register');
+    const loginButtonEl = document.querySelector('.menu-item_login > a');
+    const loginModal = App.getModal('login');
+    const logoutButtonEl = document.querySelector('.menu-item_logout > a');
 
+    registerButtonEl.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      registerModal.open();
+    });
+
+    loginButtonEl.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      loginModal.open();
+    });
+
+    logoutButtonEl.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      User.logout((err, response) => {
+        if (err) {
+          return;
+        }
+
+        if (response.success) {
+          App.setState('init');
+        }
+      });
+    });
   }
 }
