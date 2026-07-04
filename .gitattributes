@@ -1,0 +1,7 @@
+vendor/adminlte/**
+public/resources/**
+public/test/**
+public/vendor/adminlte/**
+
+public/app.css
+public/index.html
