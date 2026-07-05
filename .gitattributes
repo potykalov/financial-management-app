@@ -1,7 +1,9 @@
-vendor/adminlte/**
-public/resources/**
-public/test/**
-public/vendor/adminlte/**
+vendor/adminlte/** linguist-vendored
+public/resources/** linguist-vendored
+public/test/** linguist-vendored
+public/vendor/adminlte/** linguist-vendored
 
-public/app.css
-public/index.html
+*.css linguist-vendored
+*.html linguist-vendored
+public/app.css linguist-vendored
+public/index.html linguist-vendored
