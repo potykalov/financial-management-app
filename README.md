@@ -333,6 +333,7 @@ financial-management-app/
 ## Лицензия
 
 Проект распространяется под лицензией MIT.
+
 Подробнее см. файл [LICENSE](LICENSE).
 
 <br>
